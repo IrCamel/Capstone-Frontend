@@ -1,0 +1,13 @@
+<div class="container-fluid">
+  <div class="row justify-content-center align-items-center">
+    <div class="post-card" *ngFor="let post of posts">
+      <div class="avatar"></div>
+      <p class="title">{{ post.title }}</p>
+      <p class="description">{{ post.description }}</p>
+      <div class="image-preview">
+        <img [src]="post.imageUrl" alt="Post Image">
+      </div>
+      <div class="comment-like"></div>
+    </div>
+  </div>
+</div>
