@@ -8,6 +8,8 @@ const routes: Routes = [
   { path: 'profilo', loadChildren: () => import('./pages/profilo/profilo.module').then(m => m.ProfiloModule), canActivate: [AuthGuard] },
   { path: 'aboutus', loadChildren: () => import('./pages/aboutus/aboutus.module').then(m => m.AboutusModule), canActivate: [AuthGuard] },
   { path: 'auth', loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule) },
+  { path: '', redirectTo: '/homepage', pathMatch: 'full' },
+  { path: '**', redirectTo: '/homepage' }
 ];
 
 @NgModule({

@@ -6,19 +6,6 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss']
 })
-export class HomepageComponent implements OnInit {
-  posts: any[] = [];
+export class HomepageComponent  {
 
-  constructor(private http: HttpClient) {}
-
-  ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:8080/post').subscribe(
-      data => {
-        this.posts = data;
-      },
-      error => {
-        console.error('Error fetching posts:', error);
-      }
-    );
-  }
 }
