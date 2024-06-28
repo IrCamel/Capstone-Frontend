@@ -42,6 +42,8 @@
   <div *ngFor="let post of posts" class="post">
     <h2>{{ post.titolo }}</h2>
     <p>{{ post.descrizione }}</p>
-    <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="{{ post.titolo }}">
+    <img [src]="getImgUrl(post.imgUrl)" alt="{{ post.titolo }}">
+    <p>Posted by: {{ post.username }}</p>
   </div>
 </div>
+

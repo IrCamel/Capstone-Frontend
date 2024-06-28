@@ -14,13 +14,14 @@ export class HomepageComponent implements OnInit {
   submitted = false;
   selectedFile: File | null = null;
   posts: any[] = [];
+  public authService: AuthService; // Rendiamo authService pubblico
 
   constructor(
     private formBuilder: FormBuilder,
-    public authService: AuthService,
+    authService: AuthService,
     private postService: PostService
   ) {
-    console.log('HomepageComponent initialized with AuthService:', this.authService);
+    this.authService = authService;
     this.postForm = this.formBuilder.group({
       titolo: ['', Validators.required],
       descrizione: ['', Validators.required],
@@ -60,8 +61,7 @@ export class HomepageComponent implements OnInit {
       descrizione: this.postForm.value.descrizione
     };
 
-    const token = this.authService.getToken() ?? '';
-    console.log('onSubmit - Token:', token);
+    const token = this.authService.getToken() ?? ''; // Usa l'operatore nullish coalescing per garantire che il token non sia mai null
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
       data => {
@@ -83,5 +83,10 @@ export class HomepageComponent implements OnInit {
         console.error('Error loading posts', error);
       }
     );
+  }
+
+  getImgUrl(imgUrl: string): string {
+    // Puoi aggiungere logica qui se necessario, ad esempio, se hai bisogno di modificare l'URL dell'immagine.
+    return imgUrl;
   }
 }
