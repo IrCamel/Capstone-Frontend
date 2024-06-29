@@ -40,11 +40,7 @@ export class LoginComponent {
 
     const credentials = {
       username: this.loginForm.value.username,
-      password: this.loginForm.value.password,
-      nome: this.loginForm.value.nome,
-      cognome: this.loginForm.value.cognome,
-      eta: this.loginForm.value.eta,
-      email: this.loginForm.value.email
+      password: this.loginForm.value.password
     };
 
     this.authService.login(credentials).subscribe(

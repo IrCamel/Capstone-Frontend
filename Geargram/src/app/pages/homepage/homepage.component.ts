@@ -14,7 +14,7 @@ export class HomepageComponent implements OnInit {
   submitted = false;
   selectedFile: File | null = null;
   posts: any[] = [];
-  public authService: AuthService; // Rendiamo authService pubblico
+  public authService: AuthService;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,15 +53,25 @@ export class HomepageComponent implements OnInit {
     this.submitted = true;
 
     if (this.postForm.invalid || !this.selectedFile) {
+      console.log('Form is invalid or file is not selected');
+      return;
+    }
+
+    const currentUser = this.authService.getCurrentUser();
+    console.log('Current user before creating post:', currentUser);
+
+    if (!currentUser || !currentUser.user.id) {
+      console.error('User ID is null or undefined');
       return;
     }
 
     const postData = {
       titolo: this.postForm.value.titolo,
-      descrizione: this.postForm.value.descrizione
+      descrizione: this.postForm.value.descrizione,
+      userId: currentUser.user.id  // Assicurati che questo valore sia presente
     };
 
-    const token = this.authService.getToken() ?? ''; // Usa l'operatore nullish coalescing per garantire che il token non sia mai null
+    const token = this.authService.getToken() ?? '';
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
       data => {
@@ -87,14 +97,10 @@ export class HomepageComponent implements OnInit {
   }
 
   getImgUrl(imgUrl: string): string {
-    // Puoi aggiungere logica qui se necessario, ad esempio, se hai bisogno di modificare l'URL dell'immagine.
     return imgUrl;
   }
-
 
   toggleText(post: any): void {
     post.isCollapsed = !post.isCollapsed;
   }
 }
-
-

@@ -22,8 +22,10 @@ export class PostService {
       'Authorization': `Bearer ${token}`
     });
 
+    console.log('FormData:', formData.get('post'), formData.get('file'));
+
     return this.http.post<any>(`${this.apiUrl}`, formData, { headers });
-  }
+}
 
   getAllPosts(): Observable<any[]> {
     const token = this.authService.getToken();
@@ -36,8 +38,6 @@ export class PostService {
   }
 
   getImageUrl(postId: number): Observable<string> {
-    return this.http.get(`${this.apiUrl}/post/image-url/${postId}`, { responseType: 'text' });
+    return this.http.get(`${this.apiUrl}/image-url/${postId}`, { responseType: 'text' });
   }
-
-
 }
