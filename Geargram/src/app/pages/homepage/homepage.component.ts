@@ -53,14 +53,13 @@ export class HomepageComponent implements OnInit {
     this.submitted = true;
 
     if (this.postForm.invalid || !this.selectedFile) {
-      console.log('Form is invalid or file is not selected');
       return;
     }
 
-    const currentUser = this.authService.getCurrentUser();
-    console.log('Current user before creating post:', currentUser);
+    const currentUser = this.authService.getCurrentUser().user;
+    console.log('Current User:', currentUser);
 
-    if (!currentUser || !currentUser.user.id) {
+    if (!currentUser || !currentUser.id) {
       console.error('User ID is null or undefined');
       return;
     }
@@ -68,14 +67,14 @@ export class HomepageComponent implements OnInit {
     const postData = {
       titolo: this.postForm.value.titolo,
       descrizione: this.postForm.value.descrizione,
-      userId: currentUser.user.id  // Assicurati che questo valore sia presente
+      userId: currentUser.id
     };
 
     const token = this.authService.getToken() ?? '';
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
       data => {
-        this.loadPosts();
+        this.posts.unshift(data); // Aggiungi il nuovo post in cima alla lista
         this.closeModal();
       },
       error => {
@@ -102,5 +101,30 @@ export class HomepageComponent implements OnInit {
 
   toggleText(post: any): void {
     post.isCollapsed = !post.isCollapsed;
+  }
+
+  toggleLike(post: any): void {
+    const currentUser = this.authService.getCurrentUser().user;
+    console.log('Current User for Like:', currentUser);
+
+    if (!currentUser || !currentUser.id) {
+      console.error('User ID is null or undefined');
+      return;
+    }
+
+    const token = this.authService.getToken() ?? '';
+
+    this.postService.toggleLike(post.id, currentUser.id, token).subscribe(
+      updatedPost => {
+        post.likeCount = updatedPost.likeCount;
+      },
+      error => {
+        console.error('Error toggling like', error);
+      }
+    );
+  }
+
+  trackByPostId(index: number, post: any): number {
+    return post.id;
   }
 }

@@ -51,9 +51,9 @@ export class AuthService {
     return this.currentUserValue?.token || null;
   }
 
-  getCurrentUser(): any {
-    const currentUser = this.currentUserValue;
-    console.log('AuthService - getCurrentUser:', currentUser);
-    return currentUser;
+
+  getCurrentUser() {
+    console.log('AuthService - getCurrentUser:', this.currentUserValue);
+    return this.currentUserValue;
   }
 }
