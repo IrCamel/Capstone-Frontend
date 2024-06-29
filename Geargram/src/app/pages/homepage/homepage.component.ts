@@ -78,6 +78,7 @@ export class HomepageComponent implements OnInit {
     this.postService.getAllPosts().subscribe(
       data => {
         this.posts = data;
+        this.posts = data.map(post => ({ ...post, isCollapsed: true }));
       },
       error => {
         console.error('Error loading posts', error);
@@ -89,4 +90,11 @@ export class HomepageComponent implements OnInit {
     // Puoi aggiungere logica qui se necessario, ad esempio, se hai bisogno di modificare l'URL dell'immagine.
     return imgUrl;
   }
+
+
+  toggleText(post: any): void {
+    post.isCollapsed = !post.isCollapsed;
+  }
 }
+
+

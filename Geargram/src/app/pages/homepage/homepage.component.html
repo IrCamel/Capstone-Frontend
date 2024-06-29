@@ -1,49 +1,57 @@
-<div *ngIf="authService.getCurrentUser()">
-  <button class="btn btn-primary" (click)="openModal()">
-    Create Post
-  </button>
-</div>
+<div class="container d-flex flex-column justify-content-center align-items-center ">
+  <div *ngIf="authService.getCurrentUser()">
+    <div class="brutalist-container">
+      <button class="brutalist-input smooth-type" (click)="openModal()" type="text">Fallo sapere a tutti...
+      </button>
+      <label class="brutalist-label">Stai pensando a qualcosa?</label>
+    </div>
+  </div>
 
-<div class="modal" [ngClass]="{'show': isModalOpen, 'fade': true}" tabindex="-1" [ngStyle]="{'display': isModalOpen ? 'block' : 'none'}">
-  <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-    <div class="modal-content modal-custom">
-      <div class="modal-header">
-        <h5 class="modal-title">Create Post</h5>
-        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
-          <div class="mb-3">
-            <label for="titolo" class="form-label">Title</label>
-            <input type="text" id="titolo" class="form-control" formControlName="titolo" />
-            <div *ngIf="submitted && f['titolo'].errors" class="invalid-feedback">
-              <div *ngIf="f['titolo'].errors['required']">Title is required</div>
+  <div class="modal" [ngClass]="{'show': isModalOpen, 'fade': true}" tabindex="-1"
+    [ngStyle]="{'display': isModalOpen ? 'block' : 'none'}">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+      <div class="modal-content modal-custom">
+        <div class="modal-header">
+          <h5 class="modal-title">Create Post</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="titolo" class="form-label">Title</label>
+              <input type="text" id="titolo" class="form-control" formControlName="titolo" />
+              <div *ngIf="submitted && f['titolo'].errors" class="invalid-feedback">
+                <div *ngIf="f['titolo'].errors['required']">Title is required</div>
+              </div>
             </div>
-          </div>
-          <div class="mb-3">
-            <label for="descrizione" class="form-label">Description</label>
-            <textarea id="descrizione" class="form-control" formControlName="descrizione"></textarea>
-            <div *ngIf="submitted && f['descrizione'].errors" class="invalid-feedback">
-              <div *ngIf="f['descrizione'].errors['required']">Description is required</div>
+            <div class="mb-3">
+              <label for="descrizione" class="form-label">Description</label>
+              <textarea id="descrizione" class="form-control" formControlName="descrizione"></textarea>
+              <div *ngIf="submitted && f['descrizione'].errors" class="invalid-feedback">
+                <div *ngIf="f['descrizione'].errors['required']">Description is required</div>
+              </div>
             </div>
-          </div>
-          <div class="mb-3">
-            <label for="file" class="form-label">Image File</label>
-            <input type="file" id="file" class="form-control" (change)="onFileChange($event)" />
-          </div>
-          <button type="submit" class="btn btn-primary">Create Post</button>
-        </form>
+            <div class="mb-3">
+              <label for="file" class="form-label">Image File</label>
+              <input type="file" id="file" class="form-control" (change)="onFileChange($event)" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create Post</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 <div class="posts">
-  <div *ngFor="let post of posts" class="post">
-    <h2>{{ post.titolo }}</h2>
-    <p>{{ post.descrizione }}</p>
-    <img [src]="getImgUrl(post.imgUrl)" alt="{{ post.titolo }}">
-    <p>Posted by: {{ post.username }}</p>
+  <div *ngFor="let post of posts" class="card bgSett my-5">
+    <h5 class="card-title m-2 text-white">Username</h5>
+    <p class="card-text m-2 text-white" [class.clamp-two]="post.isCollapsed">{{post.descrizione}}</p>
+    <button class="reveal text-white" (click)="toggleText(post)">{{ post.isCollapsed ? 'Mostra altro' : 'Mostra meno' }}</button>
+    <img class="imgSett" [src]="getImgUrl(post.imgUrl)" alt="{{ post.titolo }}">
+    <div class="card-body p-2">
+      <i class="bi bi-heart icon1 text-white"></i>
+      <i class="bi bi-chat icon2 text-white"></i>
+    </div>
   </div>
 </div>
 
