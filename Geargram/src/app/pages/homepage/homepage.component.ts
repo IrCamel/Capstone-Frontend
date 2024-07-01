@@ -10,10 +10,14 @@ import { PostService } from '../../services/posts.service';
 })
 export class HomepageComponent implements OnInit {
   postForm: FormGroup;
+  commentForm: FormGroup;
   isModalOpen = false;
+  isCommentModalOpen = false;
   submitted = false;
   selectedFile: File | null = null;
   posts: any[] = [];
+  comments: any[] = [];
+  currentPostId: number | null = null;
   public authService: AuthService;
 
   constructor(
@@ -27,6 +31,10 @@ export class HomepageComponent implements OnInit {
       descrizione: ['', Validators.required],
       imageUrl: ['']
     });
+
+    this.commentForm = this.formBuilder.group({
+      content: ['', Validators.required]
+    });
   }
 
   ngOnInit(): void {
@@ -35,12 +43,24 @@ export class HomepageComponent implements OnInit {
 
   get f() { return this.postForm.controls; }
 
+  get cf() { return this.commentForm.controls; }
+
   openModal(): void {
     this.isModalOpen = true;
   }
 
   closeModal(): void {
     this.isModalOpen = false;
+  }
+
+  openCommentModal(postId: number): void {
+    this.currentPostId = postId;
+    this.isCommentModalOpen = true;
+    this.loadComments(postId);
+  }
+
+  closeCommentModal(): void {
+    this.isCommentModalOpen = false;
   }
 
   onFileChange(event: any): void {
@@ -74,7 +94,7 @@ export class HomepageComponent implements OnInit {
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
       data => {
-        this.posts.unshift({ ...data, likedByCurrentUser: false }); // Aggiungi il nuovo post in cima alla lista
+        this.posts.unshift({ ...data, likedByCurrentUser: false, comments: [] }); // Aggiungi il nuovo post in cima alla lista
         this.closeModal();
       },
       error => {
@@ -91,11 +111,52 @@ export class HomepageComponent implements OnInit {
           ...post,
           isCollapsed: true,
           likedBy: post.likedBy || [], // Assicura che likedBy sia un array
-          likedByCurrentUser: (post.likedBy || []).includes(currentUser.id)
+          likedByCurrentUser: post.likedBy && post.likedBy.includes(currentUser.id),
+          comments: post.comments || [], // Assicura che comments sia un array
+          savedByCurrentUser: post.savedBy && post.savedBy.includes(currentUser.id) // Controlla se il post è stato salvato dall'utente corrente
         }));
       },
       error => {
         console.error('Error loading posts', error);
+      }
+    );
+  }
+
+  loadComments(postId: number): void {
+    const token = this.authService.getToken() ?? '';
+    this.postService.getCommentsByPostId(postId, token).subscribe(
+      data => {
+        this.comments = data;
+        const post = this.posts.find(p => p.id === postId);
+        if (post) {
+          post.comments = data; // Aggiorna il contatore dei commenti
+        }
+      },
+      error => {
+        console.error('Error loading comments', error);
+      }
+    );
+  }
+
+  onSubmitComment(): void {
+    if (this.commentForm.invalid || !this.currentPostId) {
+      return;
+    }
+
+    const currentUser = this.authService.getCurrentUser().user;
+    const token = this.authService.getToken() ?? '';
+
+    this.postService.addComment(this.currentPostId, currentUser.id, this.commentForm.value.content, token).subscribe(
+      data => {
+        this.comments.push(data);
+        this.commentForm.reset();
+        const post = this.posts.find(p => p.id === this.currentPostId);
+        if (post) {
+          post.comments.push(data); // Aggiorna il contatore dei commenti
+        }
+      },
+      error => {
+        console.error('Error adding comment', error);
       }
     );
   }
@@ -130,7 +191,5 @@ export class HomepageComponent implements OnInit {
     );
   }
 
-  trackByPostId(index: number, post: any): number {
-    return post.id;
-  }
+
 }

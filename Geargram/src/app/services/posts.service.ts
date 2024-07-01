@@ -8,6 +8,7 @@ import { AuthService } from '../auth/auth.service';
 })
 export class PostService {
   private apiUrl = 'http://localhost:8080/post';
+  postService: any;
 
   constructor(private http: HttpClient, private authService: AuthService) {
     console.log('PostService initialized with AuthService:', this.authService);
@@ -46,4 +47,21 @@ export class PostService {
 
     return this.http.put<any>(`${this.apiUrl}/${postId}/like/${userId}`, {}, { headers });
   }
+
+  addComment(postId: number, userId: number, content: string, token: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<any>(`${this.apiUrl}/${postId}/comment/${userId}`, content, { headers });
+  }
+
+  getCommentsByPostId(postId: number, token: string): Observable<any[]> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<any[]>(`${this.apiUrl}/${postId}/comments`, { headers });
+  }
+
 }
