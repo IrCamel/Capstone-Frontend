@@ -74,7 +74,7 @@ export class HomepageComponent implements OnInit {
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
       data => {
-        this.posts.unshift(data); // Aggiungi il nuovo post in cima alla lista
+        this.posts.unshift({ ...data, likedByCurrentUser: false }); // Aggiungi il nuovo post in cima alla lista
         this.closeModal();
       },
       error => {
@@ -84,10 +84,15 @@ export class HomepageComponent implements OnInit {
   }
 
   loadPosts(): void {
+    const currentUser = this.authService.getCurrentUser().user;
     this.postService.getAllPosts().subscribe(
       data => {
-        this.posts = data;
-        this.posts = data.map(post => ({ ...post, isCollapsed: true }));
+        this.posts = data.map(post => ({
+          ...post,
+          isCollapsed: true,
+          likedBy: post.likedBy || [], // Assicura che likedBy sia un array
+          likedByCurrentUser: (post.likedBy || []).includes(currentUser.id)
+        }));
       },
       error => {
         console.error('Error loading posts', error);
@@ -117,6 +122,7 @@ export class HomepageComponent implements OnInit {
     this.postService.toggleLike(post.id, currentUser.id, token).subscribe(
       updatedPost => {
         post.likeCount = updatedPost.likeCount;
+        post.likedByCurrentUser = !post.likedByCurrentUser; // Inverti lo stato del like
       },
       error => {
         console.error('Error toggling like', error);
