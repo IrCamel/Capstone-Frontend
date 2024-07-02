@@ -1,0 +1,17 @@
+<div *ngIf="savedPosts.length === 0">
+  <p>No saved posts to display.</p>
+</div>
+
+<div *ngIf="savedPosts.length > 0">
+  <div *ngFor="let post of savedPosts" class="card bgSett my-5">
+    <h5 class="card-title m-2 text-white">{{ post.username }}</h5>
+    <p class="card-text m-2 text-white" [class.clamp-two]="post.isCollapsed">{{ post.descrizione }}</p>
+    <button class="reveal text-white" (click)="toggleText(post)">{{ post.isCollapsed ? 'Mostra altro' : 'Mostra meno' }}</button>
+    <img class="imgSett" [src]="getImgUrl(post.imageUrl)" alt="{{ post.titolo }}">
+    <div class="card-body p-2">
+      <i [ngClass]="{'bi bi-heart': !post.likedByCurrentUser, 'bi bi-heart-fill': post.likedByCurrentUser}"
+        class="icon1 text-white" (click)="toggleLike(post)"></i> {{ post.likeCount }}
+      <i class="bi bi-chat icon2 text-white" (click)="openCommentModal(post.id)"></i> {{ post.comments.length }}
+    </div>
+  </div>
+</div>

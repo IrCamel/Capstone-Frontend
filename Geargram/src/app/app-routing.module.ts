@@ -21,6 +21,7 @@ const routes: Routes = [
   { path: 'homepage',
     loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepageModule)
   },
+  { path: 'savedPost', loadChildren: () => import('./pages/saved-post/saved-post.module').then(m => m.SavedPostModule) },
 ];
 
 @NgModule({

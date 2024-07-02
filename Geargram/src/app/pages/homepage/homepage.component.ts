@@ -124,7 +124,7 @@ export class HomepageComponent implements OnInit {
 
   loadComments(postId: number): void {
     const token = this.authService.getToken() ?? '';
-    this.postService.getCommentsByPostId(postId, token).subscribe(
+    this.postService.getCommentsByPostId(postId).subscribe(
       data => {
         this.comments = data;
         const post = this.posts.find(p => p.id === postId);
@@ -191,5 +191,24 @@ export class HomepageComponent implements OnInit {
     );
   }
 
+  toggleSave(post: any): void {
+    const currentUser = this.authService.getCurrentUser().user;
+    console.log('Current User for Save:', currentUser);
 
+    if (!currentUser || !currentUser.id) {
+      console.error('User ID is null or undefined');
+      return;
+    }
+
+    const token = this.authService.getToken() ?? '';
+
+    this.postService.toggleSave(post.id, currentUser.id, token).subscribe(
+      updatedPost => {
+        post.savedByCurrentUser = !post.savedByCurrentUser; // Inverti lo stato del salvataggio
+      },
+      error => {
+        console.error('Error toggling save', error);
+      }
+    );
+  }
 }

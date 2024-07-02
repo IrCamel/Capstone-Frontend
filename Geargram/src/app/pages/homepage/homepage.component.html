@@ -50,7 +50,8 @@
         <i [ngClass]="{'bi bi-heart': !post.likedByCurrentUser, 'bi bi-heart-fill': post.likedByCurrentUser}"
           class="icon1 text-white" (click)="toggleLike(post)"></i> {{ post.likeCount }}
         <i class="bi bi-chat icon2 text-white" (click)="openCommentModal(post.id)"></i> {{ post.comments.length }}
-        <i class="bi bi-bookmark icon3"></i>
+        <i [ngClass]="{'bi bi-bookmark': !post.savedByCurrentUser, 'bi bi-bookmark-fill': post.savedByCurrentUser}"
+          class="icon3 text-white" (click)="toggleSave(post)"></i>
       </div>
 
       <div class="modal" [ngClass]="{'show': isCommentModalOpen, 'fade': true}" tabindex="-1"
@@ -79,7 +80,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
