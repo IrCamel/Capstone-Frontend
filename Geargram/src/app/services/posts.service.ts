@@ -35,6 +35,13 @@ export class PostService {
     return this.http.get<any[]>(`${this.apiUrl}`, { headers });
   }
 
+  deletePost(postId: number, userId: number, token: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.delete(`${this.apiUrl}/${postId}/user/${userId}`, { headers });
+  }
+
   getImageUrl(postId: number): Observable<string> {
     return this.http.get(`${this.apiUrl}/image-url/${postId}`, { responseType: 'text' });
   }
@@ -64,6 +71,14 @@ export class PostService {
     });
 
     return this.http.get<any[]>(`${this.apiUrl}/${postId}/comments`, { headers });
+  }
+
+  deleteComment(commentId: number, userId: number, token: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete<any>(`${this.apiUrl}/comment/${commentId}/user/${userId}`, { headers });
   }
 
   toggleSave(postId: number, userId: number, token: string): Observable<any> {

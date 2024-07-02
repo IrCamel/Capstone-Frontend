@@ -6,7 +6,7 @@ import { PostService } from '../../services/posts.service';
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.component.html',
-  styleUrls: ['./homepage.component.scss']
+  styleUrls: ['./homepage.component.scss'],
 })
 export class HomepageComponent implements OnInit {
   postForm: FormGroup;
@@ -19,6 +19,8 @@ export class HomepageComponent implements OnInit {
   comments: any[] = [];
   currentPostId: number | null = null;
   public authService: AuthService;
+  isSubmittingComment = false;
+  isDeletingComment = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -29,21 +31,26 @@ export class HomepageComponent implements OnInit {
     this.postForm = this.formBuilder.group({
       titolo: ['', Validators.required],
       descrizione: ['', Validators.required],
-      imageUrl: ['']
+      imageUrl: [''],
     });
 
     this.commentForm = this.formBuilder.group({
-      content: ['', Validators.required]
+      content: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
     this.loadPosts();
+    console.log('Current User ID:', this.authService.getCurrentUser().user.id);
   }
 
-  get f() { return this.postForm.controls; }
+  get f() {
+    return this.postForm.controls;
+  }
 
-  get cf() { return this.commentForm.controls; }
+  get cf() {
+    return this.commentForm.controls;
+  }
 
   openModal(): void {
     this.isModalOpen = true;
@@ -87,17 +94,21 @@ export class HomepageComponent implements OnInit {
     const postData = {
       titolo: this.postForm.value.titolo,
       descrizione: this.postForm.value.descrizione,
-      userId: currentUser.id
+      userId: currentUser.id,
     };
 
     const token = this.authService.getToken() ?? '';
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
-      data => {
-        this.posts.unshift({ ...data, likedByCurrentUser: false, comments: [] }); // Aggiungi il nuovo post in cima alla lista
+      (data) => {
+        this.posts.unshift({
+          ...data,
+          likedByCurrentUser: false,
+          comments: [],
+        }); // Aggiungi il nuovo post in cima alla lista
         this.closeModal();
       },
-      error => {
+      (error) => {
         console.error('Error creating post', error);
       }
     );
@@ -106,17 +117,22 @@ export class HomepageComponent implements OnInit {
   loadPosts(): void {
     const currentUser = this.authService.getCurrentUser().user;
     this.postService.getAllPosts().subscribe(
-      data => {
-        this.posts = data.map(post => ({
-          ...post,
-          isCollapsed: true,
-          likedBy: post.likedBy || [], // Assicura che likedBy sia un array
-          likedByCurrentUser: post.likedBy && post.likedBy.includes(currentUser.id),
-          comments: post.comments || [], // Assicura che comments sia un array
-          savedByCurrentUser: post.savedBy && post.savedBy.includes(currentUser.id) // Controlla se il post è stato salvato dall'utente corrente
-        }));
+      (data) => {
+        this.posts = data.map((post) => {
+          console.log('Post User ID:', post.userId); // Log the post user ID
+          return {
+            ...post,
+            isCollapsed: true,
+            likedBy: post.likedBy || [], // Assicura che likedBy sia un array
+            likedByCurrentUser:
+              post.likedBy && post.likedBy.includes(currentUser.id),
+            comments: post.comments || [], // Assicura che comments sia un array
+            savedByCurrentUser:
+              post.savedBy && post.savedBy.includes(currentUser.id), // Controlla se il post è stato salvato dall'utente corrente
+          };
+        });
       },
-      error => {
+      (error) => {
         console.error('Error loading posts', error);
       }
     );
@@ -125,38 +141,90 @@ export class HomepageComponent implements OnInit {
   loadComments(postId: number): void {
     const token = this.authService.getToken() ?? '';
     this.postService.getCommentsByPostId(postId).subscribe(
-      data => {
+      (data) => {
         this.comments = data;
-        const post = this.posts.find(p => p.id === postId);
+        const post = this.posts.find((p) => p.id === postId);
         if (post) {
           post.comments = data; // Aggiorna il contatore dei commenti
         }
       },
-      error => {
+      (error) => {
         console.error('Error loading comments', error);
       }
     );
   }
 
   onSubmitComment(): void {
-    if (this.commentForm.invalid || !this.currentPostId) {
+    if (
+      this.commentForm.invalid ||
+      !this.currentPostId ||
+      this.isSubmittingComment
+    ) {
       return;
     }
+
+    this.isSubmittingComment = true;
 
     const currentUser = this.authService.getCurrentUser().user;
     const token = this.authService.getToken() ?? '';
 
-    this.postService.addComment(this.currentPostId, currentUser.id, this.commentForm.value.content, token).subscribe(
-      data => {
-        this.comments.push(data);
-        this.commentForm.reset();
-        const post = this.posts.find(p => p.id === this.currentPostId);
-        if (post) {
-          post.comments.push(data); // Aggiorna il contatore dei commenti
+    this.postService
+      .addComment(
+        this.currentPostId,
+        currentUser.id,
+        this.commentForm.value.content,
+        token
+      )
+      .subscribe(
+        (data) => {
+          // Assicuriamoci che il commento non venga duplicato
+          this.comments = this.comments.filter(
+            (comment) => comment.id !== data.id
+          );
+          this.comments.push(data);
+          const post = this.posts.find((p) => p.id === this.currentPostId);
+          if (post) {
+            post.comments = post.comments.filter(
+              (comment: any) => comment.id !== data.id
+            );
+            post.comments.push(data); // Aggiorna il contatore dei commenti
+          }
+          this.commentForm.reset();
+          this.isSubmittingComment = false;
+        },
+        (error) => {
+          console.error('Error adding comment', error);
+          this.isSubmittingComment = false;
         }
+      );
+  }
+
+  deleteComment(commentId: number): void {
+    if (this.currentPostId === null || this.isDeletingComment) {
+      return;
+    }
+
+    this.isDeletingComment = true;
+
+    const currentUser = this.authService.getCurrentUser().user;
+    const token = this.authService.getToken() ?? '';
+
+    this.postService.deleteComment(commentId, currentUser.id, token).subscribe(
+      () => {
+        this.comments = this.comments.filter(
+          (comment) => comment.id !== commentId
+        );
+        const post = this.posts.find((p) => p.id === this.currentPostId);
+        if (post) {
+          post.comments = post.comments.filter(
+            (comment: { id: number }) => comment.id !== commentId
+          ); // Rimuovi il commento dalla lista dei commenti del post
+        }
+        this.isDeletingComment = false;
       },
-      error => {
-        console.error('Error adding comment', error);
+      (error) => {
+        console.error('Error deleting comment', error);
+        this.isDeletingComment = false;
       }
     );
   }
@@ -181,11 +249,11 @@ export class HomepageComponent implements OnInit {
     const token = this.authService.getToken() ?? '';
 
     this.postService.toggleLike(post.id, currentUser.id, token).subscribe(
-      updatedPost => {
+      (updatedPost) => {
         post.likeCount = updatedPost.likeCount;
         post.likedByCurrentUser = !post.likedByCurrentUser; // Inverti lo stato del like
       },
-      error => {
+      (error) => {
         console.error('Error toggling like', error);
       }
     );
@@ -203,11 +271,25 @@ export class HomepageComponent implements OnInit {
     const token = this.authService.getToken() ?? '';
 
     this.postService.toggleSave(post.id, currentUser.id, token).subscribe(
-      updatedPost => {
+      (updatedPost) => {
         post.savedByCurrentUser = !post.savedByCurrentUser; // Inverti lo stato del salvataggio
       },
-      error => {
+      (error) => {
         console.error('Error toggling save', error);
+      }
+    );
+  }
+
+  deletePost(postId: number): void {
+    const currentUser = this.authService.getCurrentUser().user;
+    const token = this.authService.getToken() ?? '';
+
+    this.postService.deletePost(postId, currentUser.id, token).subscribe(
+      () => {
+        this.posts = this.posts.filter((post) => post.id !== postId); // Rimuove il post dalla lista
+      },
+      (error) => {
+        console.error('Error deleting post', error);
       }
     );
   }
