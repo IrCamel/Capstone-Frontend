@@ -43,8 +43,11 @@
   <div class="posts">
     <div *ngFor="let post of posts;" class="card bgSett my-5">
       <div class="d-flex justify-content-between align-items-center">
-        <h5 class="card-title m-2 text-white">{{ post.username }}</h5>
-        <i *ngIf="post.userId === authService.getCurrentUser().user.id" class="bi bi-trash text-white text-white ms-auto fs-4 p-2" (click)="deletePost(post.id)"></i>
+        <div class="d-flex align-items-center">
+          <img [src]="post.avatar"  class="avatar avatarSett">
+          <h5 class="card-title m-2 text-white">{{ post.username }}</h5>
+        </div>
+        <i *ngIf="post.userId === authService.getCurrentUser().id" class="bi bi-trash text-white ms-auto fs-4 p-2" (click)="deletePost(post.id)"></i>
       </div>
       <p class="card-text m-2 text-white" [class.clamp-two]="post.isCollapsed">{{ post.descrizione }}</p>
       <button class="reveal text-white" (click)="toggleText(post)">{{ post.isCollapsed ? 'Mostra altro' : 'Mostra meno' }}</button>
@@ -52,8 +55,8 @@
       <div class="card-body p-2 d-flex mb-2">
         <i [ngClass]="{'bi bi-heart': !post.likedByCurrentUser, 'bi bi-heart-fill': post.likedByCurrentUser}"
           class="icon1 text-white" (click)="toggleLike(post)"></i> {{ post.likeCount }}
-        <i class="bi bi-chat icon2 text-whites" (click)="openCommentModal(post.id)"></i> {{ post.comments.length }}
-        <i [ngClass]="{'bi bi-bookmark text-white ': !post.savedByCurrentUser, 'bi bi-bookmark-fill ': post.savedByCurrentUser}"
+        <i class="bi bi-chat icon2 text-white" (click)="openCommentModal(post.id)"></i> {{ post.comments.length }}
+        <i [ngClass]="{'bi bi-bookmark text-white': !post.savedByCurrentUser, 'bi bi-bookmark-fill text-white': post.savedByCurrentUser}"
           class="icon3 text-white ms-auto fs-4" (click)="toggleSave(post)"></i>
       </div>
 
@@ -68,7 +71,7 @@
             <div class="modal-body">
               <div *ngFor="let comment of comments" class="d-flex justify-content-between align-items-center">
                 <p class="mb-0"><strong>{{ comment.username }}</strong>: {{ comment.content }}</p>
-                <i *ngIf="comment.username === authService.getCurrentUser().user.username" class="bi bi-trash text-white ms-2" (click)="deleteComment(comment.id)"></i>
+                <i *ngIf="comment.username === authService.getCurrentUser().username" class="bi bi-trash text-white ms-2" (click)="deleteComment(comment.id)"></i>
               </div>
               <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
                 <div class="mb-3">

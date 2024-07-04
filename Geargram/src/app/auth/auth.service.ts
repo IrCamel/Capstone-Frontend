@@ -31,14 +31,19 @@ export class AuthService {
       }));
   }
 
-  register(user: any): Observable<any> {
-    return this.http.post<any>('http://localhost:8080/users', user)
-      .pipe(map(user => {
-        if (user && user.token) {
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
+
+  register(user: any, file: File): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('user', JSON.stringify(user));
+    formData.append('file', file);
+
+    return this.http.post<any>('http://localhost:8080/users', formData)
+      .pipe(map(response => {
+        if (response && response.token) {
+          localStorage.setItem('currentUser', JSON.stringify(response));
+          this.currentUserSubject.next(response);
         }
-        return user;
+        return response;
       }));
   }
 
@@ -51,9 +56,11 @@ export class AuthService {
     return this.currentUserValue?.token || null;
   }
 
-
   getCurrentUser() {
-    console.log('AuthService - getCurrentUser:', this.currentUserValue);
-    return this.currentUserValue;
+    const currentUser = this.currentUserSubject.value;
+    if (currentUser) {
+      return currentUser;
+    }
+    return null;
   }
 }

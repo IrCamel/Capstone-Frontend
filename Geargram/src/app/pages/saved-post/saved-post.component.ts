@@ -14,14 +14,12 @@ export class SavedPostComponent implements OnInit {
   isCommentModalOpen = false;
   comments: any[] = [];
   currentPostId: number | null = null;
-  public authService: AuthService;
 
   constructor(
     private formBuilder: FormBuilder,
-    authService: AuthService,
+    public authService: AuthService,
     private postService: PostService
   ) {
-    this.authService = authService;
     this.commentForm = this.formBuilder.group({
       content: ['', Validators.required]
     });
@@ -32,10 +30,19 @@ export class SavedPostComponent implements OnInit {
   }
 
   loadSavedPosts(): void {
-    const currentUser = this.authService.getCurrentUser().user;
-    const token = this.authService.getToken() ?? '';
+    const currentUser = this.authService.getCurrentUser();
 
-    console.log('Current User:', currentUser);
+    if (!currentUser) {
+      console.error('CurrentUser is null or undefined');
+      return;
+    }
+
+    if (!currentUser.id) {
+      console.error('User ID is null or undefined');
+      return;
+    }
+
+    const token = this.authService.getToken() ?? '';
 
     this.postService.getSavedPosts(currentUser.id, token).subscribe(
       data => {
@@ -61,13 +68,11 @@ export class SavedPostComponent implements OnInit {
   }
 
   getImgUrl(imgUrl: string): string {
-    console.log('Image URL:', imgUrl);
     return imgUrl;
   }
 
   toggleLike(post: any): void {
-    const currentUser = this.authService.getCurrentUser().user;
-    console.log('Current User for Like:', currentUser);
+    const currentUser = this.authService.getCurrentUser();
 
     if (!currentUser || !currentUser.id) {
       console.error('User ID is null or undefined');
@@ -78,7 +83,6 @@ export class SavedPostComponent implements OnInit {
 
     this.postService.toggleLike(post.id, currentUser.id, token).subscribe(
       updatedPost => {
-        console.log('Updated Post after Like:', updatedPost);
         post.likeCount = updatedPost.likeCount;
         post.likedByCurrentUser = !post.likedByCurrentUser; // Inverti lo stato del like
       },
@@ -89,8 +93,7 @@ export class SavedPostComponent implements OnInit {
   }
 
   toggleSave(post: any): void {
-    const currentUser = this.authService.getCurrentUser().user;
-    console.log('Current User for Save:', currentUser);
+    const currentUser = this.authService.getCurrentUser();
 
     if (!currentUser || !currentUser.id) {
       console.error('User ID is null or undefined');
@@ -101,7 +104,6 @@ export class SavedPostComponent implements OnInit {
 
     this.postService.toggleSave(post.id, currentUser.id, token).subscribe(
       updatedPost => {
-        console.log('Updated Post after Save:', updatedPost);
         post.savedByCurrentUser = !post.savedByCurrentUser; // Inverti lo stato del salvataggio
       },
       error => {
@@ -122,11 +124,8 @@ export class SavedPostComponent implements OnInit {
 
   loadComments(postId: number): void {
     const token = this.authService.getToken() ?? '';
-    console.log('Loading comments for post ID:', postId);
-
-    this.postService.getCommentsByPostId(postId, ).subscribe(
+    this.postService.getCommentsByPostId(postId).subscribe(
       data => {
-        console.log('Comments Data:', data);
         this.comments = data;
         const post = this.savedPosts.find(p => p.id === postId);
         if (post) {
@@ -144,12 +143,11 @@ export class SavedPostComponent implements OnInit {
       return;
     }
 
-    const currentUser = this.authService.getCurrentUser().user;
+    const currentUser = this.authService.getCurrentUser();
     const token = this.authService.getToken() ?? '';
 
     this.postService.addComment(this.currentPostId, currentUser.id, this.commentForm.value.content, token).subscribe(
       data => {
-        console.log('Added Comment Data:', data);
         this.comments.push(data);
         this.commentForm.reset();
         const post = this.savedPosts.find(p => p.id === this.currentPostId);

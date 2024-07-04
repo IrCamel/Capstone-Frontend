@@ -19,11 +19,7 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.formBuilder.group({
-      nome: ['', Validators.required],
-      cognome: ['', Validators.required],
-      eta: ['', [Validators.required, Validators.min(1)]],
       username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
   }
@@ -38,12 +34,7 @@ export class LoginComponent {
       return;
     }
 
-    const credentials = {
-      username: this.loginForm.value.username,
-      password: this.loginForm.value.password
-    };
-
-    this.authService.login(credentials).subscribe(
+    this.authService.login(this.loginForm.value).subscribe(
       data => {
         console.log('Login successful', data);
         this.router.navigate(['/homepage']);

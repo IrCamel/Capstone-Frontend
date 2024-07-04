@@ -10,7 +10,6 @@ export class PostService {
   private apiUrl = 'http://localhost:8080/post';
 
   constructor(private http: HttpClient, private authService: AuthService) {
-    console.log('PostService initialized with AuthService:', this.authService);
   }
 
   createPost(postData: any, file: File, token: string): Observable<any> {
@@ -27,7 +26,6 @@ export class PostService {
 
   getAllPosts(): Observable<any[]> {
     const token = this.authService.getToken();
-    console.log('getAllPosts - Token:', token);
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`

@@ -13,6 +13,7 @@ export class RegisterComponent {
   submitted = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  selectedFile: File | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -25,28 +26,46 @@ export class RegisterComponent {
       eta: ['', [Validators.required, Validators.min(1)]],
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      avatar: [null, Validators.required] // Aggiungi il controllo per l'avatar
     });
   }
 
   get f() { return this.registerForm.controls; }
+
+  onFileChange(event: any) {
+    if (event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+      this.registerForm.patchValue({
+        avatar: this.selectedFile
+      });
+    }
+  }
 
   onSubmit() {
     this.submitted = true;
     this.errorMessage = null;
     this.successMessage = null;
 
-    if (this.registerForm.invalid) {
+    if (this.registerForm.invalid || !this.selectedFile) {
       return;
     }
 
-    this.authService.register(this.registerForm.value).subscribe(
+    const formData = {
+      nome: this.registerForm.value.nome,
+      cognome: this.registerForm.value.cognome,
+      eta: this.registerForm.value.eta,
+      username: this.registerForm.value.username,
+      email: this.registerForm.value.email,
+      password: this.registerForm.value.password,
+    };
+
+    this.authService.register(formData, this.selectedFile).subscribe(
       data => {
         console.log('Registration successful', data);
         this.successMessage = 'Registration successful!';
         this.registerForm.reset();
         this.submitted = false;
-        // Reindirizza alla homepage dopo la registrazione
         this.router.navigate(['/homepage']);
       },
       error => {

@@ -18,16 +18,15 @@ export class HomepageComponent implements OnInit {
   posts: any[] = [];
   comments: any[] = [];
   currentPostId: number | null = null;
-  public authService: AuthService;
   isSubmittingComment = false;
   isDeletingComment = false;
+  currentUser: any;
 
   constructor(
     private formBuilder: FormBuilder,
-    authService: AuthService,
+    public authService: AuthService,
     private postService: PostService
   ) {
-    this.authService = authService;
     this.postForm = this.formBuilder.group({
       titolo: ['', Validators.required],
       descrizione: ['', Validators.required],
@@ -41,7 +40,7 @@ export class HomepageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPosts();
-    console.log('Current User ID:', this.authService.getCurrentUser().user.id);
+    this.currentUser = this.authService.getCurrentUser();
   }
 
   get f() {
@@ -83,9 +82,7 @@ export class HomepageComponent implements OnInit {
       return;
     }
 
-    const currentUser = this.authService.getCurrentUser().user;
-    console.log('Current User:', currentUser);
-
+    const currentUser = this.authService.getCurrentUser();
     if (!currentUser || !currentUser.id) {
       console.error('User ID is null or undefined');
       return;
@@ -105,7 +102,7 @@ export class HomepageComponent implements OnInit {
           ...data,
           likedByCurrentUser: false,
           comments: [],
-        }); // Aggiungi il nuovo post in cima alla lista
+        });
         this.closeModal();
       },
       (error) => {
@@ -115,22 +112,18 @@ export class HomepageComponent implements OnInit {
   }
 
   loadPosts(): void {
-    const currentUser = this.authService.getCurrentUser().user;
+    const currentUser = this.authService.getCurrentUser();
     this.postService.getAllPosts().subscribe(
       (data) => {
-        this.posts = data.map((post) => {
-          console.log('Post User ID:', post.userId); // Log the post user ID
-          return {
-            ...post,
-            isCollapsed: true,
-            likedBy: post.likedBy || [], // Assicura che likedBy sia un array
-            likedByCurrentUser:
-              post.likedBy && post.likedBy.includes(currentUser.id),
-            comments: post.comments || [], // Assicura che comments sia un array
-            savedByCurrentUser:
-              post.savedBy && post.savedBy.includes(currentUser.id), // Controlla se il post è stato salvato dall'utente corrente
-          };
-        });
+        this.posts = data.map((post) => ({
+          ...post,
+          isCollapsed: true,
+          likedBy: post.likedBy || [],
+          likedByCurrentUser: post.likedBy && post.likedBy.includes(currentUser.id),
+          comments: post.comments || [],
+          savedByCurrentUser: post.savedBy && post.savedBy.includes(currentUser.id),
+          avatar: post.userAvatar
+        }));
       },
       (error) => {
         console.error('Error loading posts', error);
@@ -145,7 +138,7 @@ export class HomepageComponent implements OnInit {
         this.comments = data;
         const post = this.posts.find((p) => p.id === postId);
         if (post) {
-          post.comments = data; // Aggiorna il contatore dei commenti
+          post.comments = data;
         }
       },
       (error) => {
@@ -155,39 +148,23 @@ export class HomepageComponent implements OnInit {
   }
 
   onSubmitComment(): void {
-    if (
-      this.commentForm.invalid ||
-      !this.currentPostId ||
-      this.isSubmittingComment
-    ) {
+    if (this.commentForm.invalid || !this.currentPostId || this.isSubmittingComment) {
       return;
     }
 
     this.isSubmittingComment = true;
 
-    const currentUser = this.authService.getCurrentUser().user;
+    const currentUser = this.authService.getCurrentUser();
     const token = this.authService.getToken() ?? '';
 
     this.postService
-      .addComment(
-        this.currentPostId,
-        currentUser.id,
-        this.commentForm.value.content,
-        token
-      )
+      .addComment(this.currentPostId, currentUser.id, this.commentForm.value.content, token)
       .subscribe(
         (data) => {
-          // Assicuriamoci che il commento non venga duplicato
-          this.comments = this.comments.filter(
-            (comment) => comment.id !== data.id
-          );
           this.comments.push(data);
           const post = this.posts.find((p) => p.id === this.currentPostId);
           if (post) {
-            post.comments = post.comments.filter(
-              (comment: any) => comment.id !== data.id
-            );
-            post.comments.push(data); // Aggiorna il contatore dei commenti
+            post.comments.push(data);
           }
           this.commentForm.reset();
           this.isSubmittingComment = false;
@@ -206,19 +183,15 @@ export class HomepageComponent implements OnInit {
 
     this.isDeletingComment = true;
 
-    const currentUser = this.authService.getCurrentUser().user;
+    const currentUser = this.authService.getCurrentUser();
     const token = this.authService.getToken() ?? '';
 
     this.postService.deleteComment(commentId, currentUser.id, token).subscribe(
       () => {
-        this.comments = this.comments.filter(
-          (comment) => comment.id !== commentId
-        );
+        this.comments = this.comments.filter((comment) => comment.id !== commentId);
         const post = this.posts.find((p) => p.id === this.currentPostId);
         if (post) {
-          post.comments = post.comments.filter(
-            (comment: { id: number }) => comment.id !== commentId
-          ); // Rimuovi il commento dalla lista dei commenti del post
+          post.comments = post.comments.filter((comment: { id: number; }) => comment.id !== commentId);
         }
         this.isDeletingComment = false;
       },
@@ -238,9 +211,7 @@ export class HomepageComponent implements OnInit {
   }
 
   toggleLike(post: any): void {
-    const currentUser = this.authService.getCurrentUser().user;
-    console.log('Current User for Like:', currentUser);
-
+    const currentUser = this.authService.getCurrentUser();
     if (!currentUser || !currentUser.id) {
       console.error('User ID is null or undefined');
       return;
@@ -251,7 +222,7 @@ export class HomepageComponent implements OnInit {
     this.postService.toggleLike(post.id, currentUser.id, token).subscribe(
       (updatedPost) => {
         post.likeCount = updatedPost.likeCount;
-        post.likedByCurrentUser = !post.likedByCurrentUser; // Inverti lo stato del like
+        post.likedByCurrentUser = !post.likedByCurrentUser;
       },
       (error) => {
         console.error('Error toggling like', error);
@@ -260,9 +231,7 @@ export class HomepageComponent implements OnInit {
   }
 
   toggleSave(post: any): void {
-    const currentUser = this.authService.getCurrentUser().user;
-    console.log('Current User for Save:', currentUser);
-
+    const currentUser = this.authService.getCurrentUser();
     if (!currentUser || !currentUser.id) {
       console.error('User ID is null or undefined');
       return;
@@ -272,7 +241,7 @@ export class HomepageComponent implements OnInit {
 
     this.postService.toggleSave(post.id, currentUser.id, token).subscribe(
       (updatedPost) => {
-        post.savedByCurrentUser = !post.savedByCurrentUser; // Inverti lo stato del salvataggio
+        post.savedByCurrentUser = !post.savedByCurrentUser;
       },
       (error) => {
         console.error('Error toggling save', error);
@@ -281,12 +250,12 @@ export class HomepageComponent implements OnInit {
   }
 
   deletePost(postId: number): void {
-    const currentUser = this.authService.getCurrentUser().user;
+    const currentUser = this.authService.getCurrentUser();
     const token = this.authService.getToken() ?? '';
 
     this.postService.deletePost(postId, currentUser.id, token).subscribe(
       () => {
-        this.posts = this.posts.filter((post) => post.id !== postId); // Rimuove il post dalla lista
+        this.posts = this.posts.filter((post) => post.id !== postId);
       },
       (error) => {
         console.error('Error deleting post', error);
