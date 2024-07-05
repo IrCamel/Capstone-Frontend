@@ -4,24 +4,31 @@ import { AuthGuard } from './auth/auth.guard';
 
 const routes: Routes = [
   { path: 'homepage',
-    loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepageModule)
+    loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepageModule),
+    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
   },
   { path: 'market',
-    loadChildren: () => import('./pages/market/market.module').then(m => m.MarketModule)
+    loadChildren: () => import('./pages/market/market.module').then(m => m.MarketModule),
+    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
   },
   { path: 'profilo',
-    loadChildren: () => import('./pages/profilo/profilo.module').then(m => m.ProfiloModule)
+    loadChildren: () => import('./pages/profilo/profilo.module').then(m => m.ProfiloModule),
+    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
   },
   { path: 'aboutus',
-    loadChildren: () => import('./pages/aboutus/aboutus.module').then(m => m.AboutusModule)
+    loadChildren: () => import('./pages/aboutus/aboutus.module').then(m => m.AboutusModule),
+    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
   },
-  { path: 'auth',
+  { path: '',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
   },
   { path: 'homepage',
-    loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepageModule)
+    loadChildren: () => import('./pages/homepage/homepage.module').then(m => m.HomepageModule),
+    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
   },
-  { path: 'savedPost', loadChildren: () => import('./pages/saved-post/saved-post.module').then(m => m.SavedPostModule) },
+  { path: 'savedPost', loadChildren: () => import('./pages/saved-post/saved-post.module').then(m => m.SavedPostModule),
+    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
+  },
 ];
 
 @NgModule({

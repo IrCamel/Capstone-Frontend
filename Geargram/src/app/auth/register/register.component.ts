@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
@@ -8,11 +8,11 @@ import { Router } from '@angular/router';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   submitted = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
+  errorMessage: string | undefined;
+  successMessage: string | undefined;
   selectedFile: File | null = null;
 
   constructor(
@@ -23,29 +23,33 @@ export class RegisterComponent {
     this.registerForm = this.formBuilder.group({
       nome: ['', Validators.required],
       cognome: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       eta: ['', [Validators.required, Validators.min(1)]],
       username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      avatar: [null, Validators.required] // Aggiungi il controllo per l'avatar
+      avatar: ['']
     });
   }
 
-  get f() { return this.registerForm.controls; }
+  ngOnInit(): void {
+  }
 
-  onFileChange(event: any) {
+  get f() {
+    return this.registerForm.controls;
+  }
+
+  onFileChange(event: any): void {
     if (event.target.files.length > 0) {
       this.selectedFile = event.target.files[0];
-      this.registerForm.patchValue({
-        avatar: this.selectedFile
-      });
+      const fileNameSpan = document.getElementById('file-chosen');
+      if (fileNameSpan && this.selectedFile) {
+        fileNameSpan.textContent = this.selectedFile.name;
+      }
     }
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted = true;
-    this.errorMessage = null;
-    this.successMessage = null;
 
     if (this.registerForm.invalid || !this.selectedFile) {
       return;
@@ -66,12 +70,19 @@ export class RegisterComponent {
         this.successMessage = 'Registration successful!';
         this.registerForm.reset();
         this.submitted = false;
-        this.router.navigate(['/homepage']);
+        this.router.navigate(['/login']);
       },
       error => {
         console.error('Registration error', error);
         this.errorMessage = 'Registration failed. Please try again.';
       }
     );
+  }
+
+  triggerFileInputClick(): void {
+    const fileInput = document.getElementById('avatar') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
   }
 }

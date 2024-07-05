@@ -98,11 +98,12 @@ export class HomepageComponent implements OnInit {
 
     this.postService.createPost(postData, this.selectedFile, token).subscribe(
       (data) => {
-        this.posts.unshift({
+        const newPost = {
           ...data,
           likedByCurrentUser: false,
           comments: [],
-        });
+        };
+        this.posts.unshift(newPost); // Aggiungi il nuovo post in cima alla lista
         this.closeModal();
       },
       (error) => {

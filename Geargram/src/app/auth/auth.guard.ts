@@ -15,5 +15,5 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     state: RouterStateSnapshot): MaybeAsync<GuardResult> {
     return true;
   }
-  
+
 }

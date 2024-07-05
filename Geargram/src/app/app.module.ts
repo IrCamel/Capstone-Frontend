@@ -11,6 +11,7 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 import { NavbarComponent } from './main-components/navbar/navbar/navbar.component';
 import { FooterComponent } from './main-components/footer/footer/footer.component';
 import { PostService } from './services/posts.service';
+import { JWT_OPTIONS, JwtHelperService, JwtModule } from '@auth0/angular-jwt';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { PostService } from './services/posts.service';
     FormsModule,
     ReactiveFormsModule,
     AuthModule,
-    HomepageModule
+    HomepageModule,
+    JwtModule
   ],
   providers: [
     AuthService,
@@ -34,7 +36,9 @@ import { PostService } from './services/posts.service';
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
+    { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
+    JwtHelperService
   ],
   bootstrap: [AppComponent]
 })
