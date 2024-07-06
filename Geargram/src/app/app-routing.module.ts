@@ -11,9 +11,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/market/market.module').then(m => m.MarketModule),
     canActivate: [AuthGuard], canActivateChild: [AuthGuard]
   },
-  { path: 'profilo',
-    loadChildren: () => import('./pages/profilo/profilo.module').then(m => m.ProfiloModule),
-    canActivate: [AuthGuard], canActivateChild: [AuthGuard]
+  { path: 'profilo/:id', loadChildren: () => import('./pages/profilo/profilo.module').then(m => m.ProfiloModule)
   },
   { path: 'aboutus',
     loadChildren: () => import('./pages/aboutus/aboutus.module').then(m => m.AboutusModule),

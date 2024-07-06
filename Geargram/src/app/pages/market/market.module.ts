@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { MarketRoutingModule } from './market-routing.module';
 import { MarketComponent } from './market.component';
+import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -11,7 +13,9 @@ import { MarketComponent } from './market.component';
   ],
   imports: [
     CommonModule,
-    MarketRoutingModule
+    MarketRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule
   ]
 })
 export class MarketModule { }

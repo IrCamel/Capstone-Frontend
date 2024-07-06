@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { PostService } from '../../services/posts.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-homepage',
@@ -25,7 +26,8 @@ export class HomepageComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     public authService: AuthService,
-    private postService: PostService
+    private postService: PostService,
+    private router: Router
   ) {
     this.postForm = this.formBuilder.group({
       titolo: ['', Validators.required],
@@ -262,5 +264,11 @@ export class HomepageComponent implements OnInit {
         console.error('Error deleting post', error);
       }
     );
+  }
+
+  navigateToUserProfile(userId: number | null): void {
+    if (userId !== null) {
+      this.router.navigate(['/profilo', userId]);
+    }
   }
 }

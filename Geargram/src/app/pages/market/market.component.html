@@ -1,1 +1,97 @@
-<p>market works!</p>
+<div class="container">
+  <div class="d-flex justify-content-end mb-4">
+    <i class="bi bi-plus-circle add-icon" (click)="openModal()"></i>
+  </div>
+
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let product of products">
+      <div class="card mb-4">
+        <img [src]="product.imgUrl" class="card-img-top" (click)="selectProduct(product)" alt="Product Image">
+        <div class="info-icon" (click)="selectProduct(product)">
+          <i class="bi bi-info-circle"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for product details -->
+<div *ngIf="selectedProduct" class="modal fade show" tabindex="-1" style="display: block;" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header justify-content-between">
+        <strong class="text-white fs-2">{{ selectedProduct.user?.username }}</strong>
+        <i type="button"  class="bi bi-x fs-1 add-icon" (click)="closeProductDetails()"></i>
+      </div>
+      <div class="modal-body">
+        <img [src]="selectedProduct.imgUrl" class="img-fluid mb-3" alt="Product Image">
+        <p class="text-white fs-2"><strong>{{selectedProduct.nomeProdotto}}</strong></p>
+        <p class="text-white fs-5"><strong class="fs-4">Dettagli: <br>
+        </strong>{{ selectedProduct.descrizioneProdotto }}</p>
+        <p class="text-white fs-3"><strong class="fs-4">Prezzo:</strong> {{ selectedProduct.prezzo }} €</p>
+        <p class="text-white fs-3"><strong class="fs-4">Categoria:</strong> {{ selectedProduct.categoria?.nome }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for creating a new product -->
+<div *ngIf="showModal" class="modal fade show modal-product" tabindex="-1" style="display: block;" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form class="form" [formGroup]="productForm" (ngSubmit)="onSubmit()">
+          <div class="d-flex justify-content-between">
+            <p class="title m-0 px-4">Nuovo Prodotto</p>
+            <i type="button" class="bi bi-x fs-2" (click)="closeModal()"></i>
+          </div>
+          <div>
+            <p class="message">Inserisci i dettagli del prodotto</p>
+          </div>
+
+          <label>
+            <input type="text" formControlName="nomeProdotto" class="input" required />
+            <span>Nome Prodotto</span>
+            <div *ngIf="submitted && f['nomeProdotto'].errors" class="invalid-feedback">
+              <div *ngIf="f['nomeProdotto'].errors['required']">Nome Prodotto is required</div>
+            </div>
+          </label>
+
+          <label>
+            <textarea formControlName="descrizioneProdotto" class="input" required></textarea>
+            <span>Descrizione Prodotto</span>
+            <div *ngIf="submitted && f['descrizioneProdotto'].errors" class="invalid-feedback">
+              <div *ngIf="f['descrizioneProdotto'].errors['required']">Descrizione Prodotto is required</div>
+            </div>
+          </label>
+
+          <label>
+            <input type="number" formControlName="prezzo" class="input" required />
+            <span>Prezzo</span>
+            <div *ngIf="submitted && f['prezzo'].errors" class="invalid-feedback">
+              <div *ngIf="f['prezzo'].errors['required']">Prezzo is required</div>
+            </div>
+          </label>
+
+          <label>
+            <select formControlName="nomeCategoria" class="input" required>
+              <option *ngFor="let categoria of categories" [value]="categoria.nome">{{ categoria.nome }}</option>
+            </select>
+            <span>Nome Categoria</span>
+            <div *ngIf="submitted && f['nomeCategoria'].errors" class="invalid-feedback">
+              <div *ngIf="f['nomeCategoria'].errors['required']">Nome Categoria is required</div>
+            </div>
+          </label>
+
+          <label class="custom-file-upload">
+            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" required />
+            Scegli file
+          </label>
+          <span id="file-chosen">Nessun file selezionato</span>
+
+          <button type="submit" class="submit">Inserisci Prodotto</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
