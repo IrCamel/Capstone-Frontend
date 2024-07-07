@@ -16,6 +16,19 @@ export class AuthService {
     const storedUser = localStorage.getItem('currentUser');
     this.currentUserSubject = new BehaviorSubject<any>(storedUser ? JSON.parse(storedUser) : null);
     this.currentUser = this.currentUserSubject.asObservable();
+
+    // Set up the auto logout based on token expiration
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      if (user.token) {
+        this.autoLogout(user.token);
+      }
+    }
+
+    // Set up the auto logout when the browser is closed or reloaded
+    window.onbeforeunload = () => {
+      this.logout();
+    };
   }
 
   public get currentUserValue(): any {
@@ -28,6 +41,7 @@ export class AuthService {
         if (user && user.token) {
           localStorage.setItem('currentUser', JSON.stringify(user));
           this.currentUserSubject.next(user);
+          this.autoLogout(user.token);  // Set up auto logout on login
         }
         return user;
       }));
@@ -43,6 +57,7 @@ export class AuthService {
         if (response && response.token) {
           localStorage.setItem('currentUser', JSON.stringify(response));
           this.currentUserSubject.next(response);
+          this.autoLogout(response.token);  // Set up auto logout on registration
         }
         return response;
       }));
@@ -71,5 +86,11 @@ export class AuthService {
     return !!token && !this.jwtHelper.isTokenExpired(token);
   }
 
-
+  autoLogout(jwt: string) {
+    const expDate = this.jwtHelper.getTokenExpirationDate(jwt) as Date;
+    const expMs = expDate.getTime() - new Date().getTime();
+    setTimeout(() => {
+      this.logout();
+    }, expMs);
+  }
 }
