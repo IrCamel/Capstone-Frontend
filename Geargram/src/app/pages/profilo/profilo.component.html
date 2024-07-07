@@ -1,10 +1,18 @@
-<div *ngIf="user">
-  <h2>{{ user.username }}</h2>
-  <p>{{ user.nome }} {{ user.cognome }}</p>
-  <p>Email: {{ user.email }}</p>
-  <p>Followers: {{ user.followersCount }}</p>
-  <p>Following: {{ user.followingCount }}</p>
-  <button (click)="toggleFollow()">
-    {{ isFollowing ? 'Unfollow' : 'Follow' }}
-  </button>
+<div class="profile-container container">
+  <div *ngIf="user" class="profile-content">
+    <img class="avatar" *ngIf="user.avatar" [src]="user.avatar" alt="User Avatar">
+    <div class="user-details">
+      <div class="username-section">
+        <h2 class="username">{{ '@' + user.username }}</h2>
+        <button class="follow-btn" (click)="toggleFollow()">
+          {{ isFollowing ? 'Unfollow' : 'Follow' }}
+        </button>
+      </div>
+      <div class="counters">
+        <p><strong>Followers:</strong> {{ user.followersCount }}</p>
+        <p><strong>Following:</strong> {{ user.followingCount }}</p>
+      </div>
+      <p class="name">{{ user.nome }} {{ user.cognome }}</p>
+    </div>
+  </div>
 </div>

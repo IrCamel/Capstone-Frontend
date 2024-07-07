@@ -25,23 +25,21 @@ export class AuthService {
       }
     }
 
-    // Set up the auto logout when the browser is closed or reloaded
-    window.onbeforeunload = () => {
-      this.logout();
-    };
   }
 
   public get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
-
   login(credentials: any): Observable<any> {
     return this.http.post<any>('http://localhost:8080/users/login', credentials)
       .pipe(map(user => {
         if (user && user.token) {
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-          this.autoLogout(user.token);  // Set up auto logout on login
+          const userWithAvatar = {
+            ...user,
+            avatar: user.avatar // Assicurati che l'avatar sia incluso
+          };
+          localStorage.setItem('currentUser', JSON.stringify(userWithAvatar));
+          this.currentUserSubject.next(userWithAvatar);
         }
         return user;
       }));
