@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -19,10 +19,10 @@ export class MarketService {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  createProduct(productData: any, file: File): Observable<any> {
+  createProduct(productData: any, files: File[]): Observable<any> {
     const formData: FormData = new FormData();
     formData.append('prodotto', JSON.stringify(productData));
-    formData.append('file', file);
+    files.forEach(file => formData.append('files', file));
     return this.http.post<any>(`${this.apiUrl}`, formData);
   }
 

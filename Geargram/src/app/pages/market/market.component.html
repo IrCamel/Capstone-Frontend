@@ -6,7 +6,7 @@
   <div class="row">
     <div class="col-12 col-md-6 col-lg-4" *ngFor="let product of products">
       <div class="card mb-4">
-        <img [src]="product.imgUrl" class="card-img-top" (click)="selectProduct(product)" alt="Product Image">
+        <img [src]="getImageUrl(product.imgUrl)" class="card-img-top" (click)="selectProduct(product)" alt="Product Image">
         <div class="info-icon" (click)="selectProduct(product)">
           <i class="bi bi-info-circle"></i>
         </div>
@@ -29,7 +29,13 @@
         <i type="button" class="bi bi-x fs-1 add-icon" (click)="closeProductDetails()"></i>
       </div>
       <div class="modal-body">
-        <img [src]="selectedProduct.imgUrl" class="img-fluid mb-3" alt="Product Image">
+        <div *ngIf="selectedProduct.imgUrl && selectedProduct.imgUrl.length > 0">
+          <img [src]="selectedProduct.imgUrl[currentIndex]" class="img-fluid mb-3" alt="Product Image">
+          <div class="slider-buttons" *ngIf="selectedProduct.imgUrl.length > 1">
+            <button (click)="prevSlide()" [disabled]="currentIndex === 0">Prev</button>
+            <button (click)="nextSlide()" [disabled]="currentIndex === selectedProduct.imgUrl.length - 1">Next</button>
+          </div>
+        </div>
         <p class="text-white fs-2"><strong>{{selectedProduct.nomeProdotto}}</strong></p>
         <p class="text-white fs-5"><strong class="fs-4">Dettagli: <br>
         </strong>{{ selectedProduct.descrizioneProdotto }}</p>
@@ -89,7 +95,7 @@
           </label>
 
           <label class="custom-file-upload">
-            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" required />
+            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" multiple required />
             Scegli file
           </label>
           <span id="file-chosen">Nessun file selezionato</span>
