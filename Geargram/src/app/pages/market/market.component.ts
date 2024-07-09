@@ -47,6 +47,7 @@ export class MarketComponent implements OnInit {
 
   loadCategories(): void {
     this.marketService.getCategorie().subscribe(data => {
+      console.log('Categories loaded:', data); // Debugging line
       this.categories = data;
     });
   }
@@ -88,6 +89,8 @@ export class MarketComponent implements OnInit {
     }
 
     const productData = this.productForm.value;
+    console.log('Submitting product:', productData); // Debugging line
+    console.log('Selected file:', this.selectedFile); // Debugging line
 
     this.marketService.createProduct(productData, this.selectedFile).subscribe(
       response => {

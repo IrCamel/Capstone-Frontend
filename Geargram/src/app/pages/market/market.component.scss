@@ -280,4 +280,12 @@
     transform: scale(1.8);
     opacity: 0;
   }
+
+}
+.avatar{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
 }

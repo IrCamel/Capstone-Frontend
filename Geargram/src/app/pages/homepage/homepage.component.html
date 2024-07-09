@@ -45,7 +45,7 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
           <img [src]="post.userAvatar || 'path-to-default-avatar'" class="avatar avatarSett" alt="Avatar" (click)="navigateToUserProfile(post.userId)">
-          <h5 class="card-title m-2 text-white" (click)="navigateToUserProfile(post.userId)">{{ post.username }}</h5>
+          <h5 class="card-title m-2 text-white name" (click)="navigateToUserProfile(post.userId)">{{ post.username }}</h5>
         </div>
         <i *ngIf="post.userId === authService.getCurrentUser().id" class="bi bi-trash text-white ms-auto fs-4 p-2" (click)="deletePost(post.id)"></i>
       </div>

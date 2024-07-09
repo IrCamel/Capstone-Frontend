@@ -6,13 +6,13 @@
   </div>
 
   <div class="nav col-md-4 col-md-auto mb-2 justify-content-center mb-md-0" *ngIf="authService.isAuthenticated()">
-      <a routerLink="/homepage" class="settA px-4 fs-3"><i class="bi bi-house"></i></a>
-      <a routerLink="/market" class="settA px-4 fs-3"><i class="bi bi-shop-window"></i></a>
-      <a routerLink="/savedPost" class="settA px-4 fs-3"><i class="bi bi-bookmark-check-fill"></i></a>
+      <a routerLink="/homepage" class="settA px-4 fs-4"><i class="bi bi-house"></i></a>
+      <a routerLink="/market" class="settA px-4 fs-4"><i class="bi bi-shop-window"></i></a>
+      <a routerLink="/savedPost" class="settA px-4 fs-4"><i class="bi bi-bookmark-check-fill"></i></a>
   </div>
 
   <div class="nav col-md-4 mb-2 justify-content-end mb-md-0">
-    <a *ngIf="authService.isAuthenticated()" routerLink="/profilo" class="settA px-3 fs-2"><i class="bi bi-person"></i></a>
-    <a (click)="logout()" class="settA px-3 fs-2 text-danger"><i class="bi bi-box-arrow-right"></i></a>
+    <a *ngIf="authService.isAuthenticated()" routerLink="/profilo" class="settA px-3 fs-3"><i class="bi bi-person"></i></a>
+    <a (click)="logout()" class="settA px-3 fs-3 text-danger"><i class="bi bi-box-arrow-right"></i></a>
   </div>
 </header>
