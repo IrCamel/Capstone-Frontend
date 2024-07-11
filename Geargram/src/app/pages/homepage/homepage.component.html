@@ -16,13 +16,6 @@
         <div class="modal-body">
           <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
-              <label for="titolo" class="form-label">Title</label>
-              <input type="text" id="titolo" class="form-control" formControlName="titolo" />
-              <div *ngIf="submitted && f['titolo'].errors" class="invalid-feedback">
-                <div *ngIf="f['titolo'].errors['required']">Title is required</div>
-              </div>
-            </div>
-            <div class="mb-3">
               <label for="descrizione" class="form-label">Description</label>
               <textarea id="descrizione" class="form-control" formControlName="descrizione"></textarea>
               <div *ngIf="submitted && f['descrizione'].errors" class="invalid-feedback">
@@ -64,9 +57,9 @@
         [ngStyle]="{'display': isCommentModalOpen ? 'block' : 'none'}">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
           <div class="modal-content modal-custom">
-            <div class="modal-header">
-              <h5 class="modal-title">Comments</h5>
-              <button type="button" class="btn-close" (click)="closeCommentModal()" aria-label="Close"></button>
+            <div class="modal-header d-flex justify-content-between">
+              <h5 class="modal-title">Commenti</h5>
+              <button type="button" class="btnSett" (click)="closeCommentModal()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
             </div>
             <div class="modal-body">
               <div *ngFor="let comment of comments" class="d-flex justify-content-between align-items-center">
@@ -75,13 +68,13 @@
               </div>
               <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
                 <div class="mb-3">
-                  <label for="content" class="form-label">Add a comment</label>
+                  <label for="content" class="form-label">Aggiungi un commento</label>
                   <textarea id="content" class="form-control" formControlName="content"></textarea>
                   <div *ngIf="submitted && cf['content'].errors" class="invalid-feedback">
                     <div *ngIf="cf['content'].errors['required']">Content is required</div>
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary" [disabled]="isSubmittingComment">Submit Comment</button>
+                <button type="submit" class="btn btnSett" [disabled]="isSubmittingComment"><i class="bi bi-send"></i></button>
               </form>
             </div>
           </div>

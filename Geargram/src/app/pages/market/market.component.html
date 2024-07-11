@@ -1,7 +1,15 @@
 <div class="container">
   <div class="d-flex justify-content-end mb-4">
-    <i class="bi bi-plus-circle add-icon" (click)="openModal()"></i>
+    <i class="bi bi-plus-circle add-icon" (click)="openModal(false)"></i>
   </div>
+
+  <!-- Search Bar -->
+  <div class="searchContainer">
+    <input type="text" name="searchKeyword" class="input" [(ngModel)]="searchKeyword" placeholder="Type to search..." (input)="searchProducts()" required>
+    <div class="icon">
+      <i class="bi bi-search"></i>
+    </div>
+</div>
 
   <div class="row">
     <div class="col-12 col-md-6 col-lg-4" *ngFor="let product of products">
@@ -30,10 +38,12 @@
       </div>
       <div class="modal-body">
         <div *ngIf="selectedProduct.imgUrl && selectedProduct.imgUrl.length > 0">
-          <img [src]="selectedProduct.imgUrl[currentIndex]" class="img-fluid mb-3" alt="Product Image">
-          <div class="slider-buttons" *ngIf="selectedProduct.imgUrl.length > 1">
-            <button (click)="prevSlide()" [disabled]="currentIndex === 0">Prev</button>
-            <button (click)="nextSlide()" [disabled]="currentIndex === selectedProduct.imgUrl.length - 1">Next</button>
+          <div class="slider-container">
+            <i class="bi bi-chevron-left slider-icon prev" (click)="prevSlide()" *ngIf="currentIndex > 0"></i>
+            <div class="imgContainer">
+              <img [src]="selectedProduct.imgUrl[currentIndex]" class="imgSettSlider" alt="Product Image">
+            </div>
+            <i class="bi bi-chevron-right slider-icon next" (click)="nextSlide()" *ngIf="currentIndex < selectedProduct.imgUrl.length - 1"></i>
           </div>
         </div>
         <p class="text-white fs-2"><strong>{{selectedProduct.nomeProdotto}}</strong></p>
@@ -41,23 +51,27 @@
         </strong>{{ selectedProduct.descrizioneProdotto }}</p>
         <p class="text-white fs-3"><strong class="fs-4">Prezzo:</strong> {{ selectedProduct.prezzo }} €</p>
         <p class="text-white fs-3"><strong class="fs-4">Categoria:</strong> {{ selectedProduct.categoria[0]?.nomeCategoria }}</p>
+        <div class="action-icons">
+          <i class="bi bi-pencil-square" (click)="editProduct(selectedProduct)"></i>
+          <i class="bi bi-trash" (click)="deleteProduct(selectedProduct.id)"></i>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal for creating a new product -->
+<!-- Modal for creating or editing a product -->
 <div *ngIf="showModal" class="modal fade show modal-product" tabindex="-1" style="display: block;" aria-modal="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-body">
         <form class="form" [formGroup]="productForm" (ngSubmit)="onSubmit()">
           <div class="d-flex justify-content-between">
-            <p class="title m-0 px-4">Nuovo Prodotto</p>
+            <p class="title m-0 px-4">{{ isEditing ? 'Modifica Prodotto' : 'Nuovo Prodotto' }}</p>
             <i type="button" class="bi bi-x fs-2" (click)="closeModal()"></i>
           </div>
           <div>
-            <p class="message">Inserisci i dettagli del prodotto</p>
+            <p class="message">{{ isEditing ? 'Modifica i dettagli del prodotto' : 'Inserisci i dettagli del prodotto' }}</p>
           </div>
 
           <label>
@@ -95,12 +109,12 @@
           </label>
 
           <label class="custom-file-upload">
-            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" multiple required />
+            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" multiple [required]="!isEditing" />
             Scegli file
           </label>
           <span id="file-chosen">Nessun file selezionato</span>
 
-          <button type="submit" class="submit">Inserisci Prodotto</button>
+          <button type="submit" class="submit">{{ isEditing ? 'Modifica Prodotto' : 'Inserisci Prodotto' }}</button>
         </form>
       </div>
     </div>

@@ -30,11 +30,26 @@ export class MarketService {
     return this.http.put<any>(`${this.apiUrl}/${id}`, productData);
   }
 
+  updateProductWithImages(id: number, productData: any, files: File[]): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('prodotto', JSON.stringify(productData));
+    files.forEach(file => formData.append('files', file));
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData);
+  }
+
   deleteProduct(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 
   getCategorie(): Observable<any[]> {
     return this.http.get<any[]>(`${this.categorieUrl}`);
+  }
+
+  searchProducts(keyword: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/search`, {
+      params: {
+        keyword: keyword
+      }
+    });
   }
 }

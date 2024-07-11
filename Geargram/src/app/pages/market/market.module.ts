@@ -1,10 +1,11 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MarketRoutingModule } from './market-routing.module';
 import { MarketComponent } from './market.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 
 
 @NgModule({
@@ -15,7 +16,9 @@ import { ReactiveFormsModule } from '@angular/forms';
     CommonModule,
     MarketRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
-  ]
+    ReactiveFormsModule,
+    FormsModule,
+  ],
+   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MarketModule { }

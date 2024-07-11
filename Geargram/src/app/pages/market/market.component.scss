@@ -40,7 +40,7 @@
   border: none;
   border-radius: 10px;
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
     transition: 0.2s;
     box-shadow: 0px 0px 8px 2px #707070,
                 0px 0px 8px 2px #707070,
@@ -79,6 +79,15 @@
   transition: opacity 0.2s;
   font-size: 1rem;
   cursor: pointer;
+}
+
+.imgContainer{
+  width: 600px;
+  height: 600px;
+  .imgSettSlider{
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .modal .modal-dialog-centered {
@@ -288,4 +297,96 @@
     border-radius: 50%;
     padding: 5px;
     cursor: pointer;
+}
+
+.slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.slider-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 5px;
+}
+
+.slider-icon.prev {
+  left: 7px;
+}
+
+.slider-icon.next {
+  right: 10px;
+}
+
+.action-icons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.action-icons i {
+  font-size: 2rem;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #eec212;
+}
+
+.action-icons i:hover {
+  color: #ff0000;
+}
+
+.searchContainer {
+  position: relative;
+  --size-button: 40px;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.input {
+  padding-left: var(--size-button);
+  height: var(--size-button);
+  font-size: 15px;
+  border: none;
+  color: #fff;
+  outline: none;
+  width: var(--size-button);
+  transition: all ease 0.3s;
+  background-color: #585858;
+  box-shadow: 1.5px 1.5px 3px #0e0e0e, -1.5px -1.5px 3px rgb(95 94 94 / 25%), inset 0px 0px 0px #0e0e0e, inset 0px -0px 0px #5f5e5e;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.input:focus,
+.input:not(:placeholder-shown) {
+  width: 200px;
+  cursor: text;
+  box-shadow: 0px 0px 0px #0e0e0e, 0px 0px 0px rgb(95 94 94 / 25%), inset 1.5px 1.5px 3px #0e0e0e, inset -1.5px -1.5px 3px #5f5e5e;
+}
+
+.input:focus + .icon,
+.input:not(:placeholder-shown) + .icon {
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.container .icon {
+  position: absolute;
+  width: var(--size-button);
+  height: var(--size-button);
+  top: -2px;
+  left: 4px;
+  padding: 8px;
+  pointer-events: none;
+}
+
+.container .icon i {
+  font-size: 20px;
 }
