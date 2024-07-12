@@ -1,20 +1,22 @@
 <div class="container">
-  <div class="d-flex justify-content-end mb-4">
+  <div class="d-flex justify-content-between mb-4">
     <i class="bi bi-plus-circle add-icon" (click)="openModal(false)"></i>
+    <!-- Search Bar -->
+    <div class="searchContainer">
+      <input type="text" name="searchKeyword" class="input" [(ngModel)]="searchKeyword" placeholder="Type to search..."
+        (input)="searchProducts()" required>
+      <div class="icon">
+        <i class="bi bi-search"></i>
+      </div>
+    </div>
   </div>
 
-  <!-- Search Bar -->
-  <div class="searchContainer">
-    <input type="text" name="searchKeyword" class="input" [(ngModel)]="searchKeyword" placeholder="Type to search..." (input)="searchProducts()" required>
-    <div class="icon">
-      <i class="bi bi-search"></i>
-    </div>
-</div>
 
   <div class="row">
     <div class="col-12 col-md-6 col-lg-4" *ngFor="let product of products">
       <div class="card mb-4">
-        <img [src]="getImageUrl(product.imgUrl)" class="card-img-top" (click)="selectProduct(product)" alt="Product Image">
+        <img [src]="getImageUrl(product.imgUrl)" class="card-img-top" (click)="selectProduct(product)"
+          alt="Product Image">
         <div class="info-icon" (click)="selectProduct(product)">
           <i class="bi bi-info-circle"></i>
         </div>
@@ -43,14 +45,16 @@
             <div class="imgContainer">
               <img [src]="selectedProduct.imgUrl[currentIndex]" class="imgSettSlider" alt="Product Image">
             </div>
-            <i class="bi bi-chevron-right slider-icon next" (click)="nextSlide()" *ngIf="currentIndex < selectedProduct.imgUrl.length - 1"></i>
+            <i class="bi bi-chevron-right slider-icon next" (click)="nextSlide()"
+              *ngIf="currentIndex < selectedProduct.imgUrl.length - 1"></i>
           </div>
         </div>
         <p class="text-white fs-2"><strong>{{selectedProduct.nomeProdotto}}</strong></p>
         <p class="text-white fs-5"><strong class="fs-4">Dettagli: <br>
-        </strong>{{ selectedProduct.descrizioneProdotto }}</p>
+          </strong>{{ selectedProduct.descrizioneProdotto }}</p>
         <p class="text-white fs-3"><strong class="fs-4">Prezzo:</strong> {{ selectedProduct.prezzo }} €</p>
-        <p class="text-white fs-3"><strong class="fs-4">Categoria:</strong> {{ selectedProduct.categoria[0]?.nomeCategoria }}</p>
+        <p class="text-white fs-3"><strong class="fs-4">Categoria:</strong> {{
+          selectedProduct.categoria[0]?.nomeCategoria }}</p>
         <div class="action-icons">
           <i class="bi bi-pencil-square" (click)="editProduct(selectedProduct)"></i>
           <i class="bi bi-trash" (click)="deleteProduct(selectedProduct.id)"></i>
@@ -71,7 +75,8 @@
             <i type="button" class="bi bi-x fs-2" (click)="closeModal()"></i>
           </div>
           <div>
-            <p class="message">{{ isEditing ? 'Modifica i dettagli del prodotto' : 'Inserisci i dettagli del prodotto' }}</p>
+            <p class="message">{{ isEditing ? 'Modifica i dettagli del prodotto' : 'Inserisci i dettagli del prodotto'
+              }}</p>
           </div>
 
           <label>
@@ -100,7 +105,8 @@
 
           <label>
             <select formControlName="nomeCategoria" class="input" required>
-              <option *ngFor="let categoria of categories" [value]="categoria.nomeCategoria">{{ categoria.nomeCategoria }}</option>
+              <option *ngFor="let categoria of categories" [value]="categoria.nomeCategoria">{{ categoria.nomeCategoria
+                }}</option>
             </select>
             <span>Nome Categoria</span>
             <div *ngIf="submitted && f['nomeCategoria'].errors" class="invalid-feedback">
@@ -109,7 +115,8 @@
           </label>
 
           <label class="custom-file-upload">
-            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" multiple [required]="!isEditing" />
+            <input type="file" id="file" (change)="onFileChange($event)" class="input-file" multiple
+              [required]="!isEditing" />
             Scegli file
           </label>
           <span id="file-chosen">Nessun file selezionato</span>

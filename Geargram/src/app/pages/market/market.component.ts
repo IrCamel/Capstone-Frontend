@@ -3,7 +3,6 @@ import { MarketService } from '../../services/market.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
-import { ImageCroppedEvent } from 'ngx-image-cropper';
 
 @Component({
   selector: 'app-market',
@@ -113,10 +112,6 @@ export class MarketComponent implements OnInit {
       };
       fileReader.readAsDataURL(this.selectedFiles[0]);
     }
-  }
-
-  imageCropped(event: ImageCroppedEvent) {
-    this.croppedImage = event.base64;
   }
 
   onSubmit(): void {

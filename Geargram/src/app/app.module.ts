@@ -12,13 +12,14 @@ import { NavbarComponent } from './main-components/navbar/navbar/navbar.componen
 import { FooterComponent } from './main-components/footer/footer/footer.component';
 import { PostService } from './services/posts.service';
 import { JWT_OPTIONS, JwtHelperService, JwtModule } from '@auth0/angular-jwt';
-import { NgForOfContext } from '@angular/common';
+
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
-    FooterComponent
+    FooterComponent,
+
   ],
   imports: [
     BrowserModule,
@@ -29,6 +30,7 @@ import { NgForOfContext } from '@angular/common';
     AuthModule,
     HomepageModule,
     JwtModule,
+
   ],
   providers: [
     AuthService,
