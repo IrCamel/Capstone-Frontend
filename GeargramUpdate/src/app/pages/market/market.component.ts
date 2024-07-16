@@ -3,6 +3,7 @@ import { MarketService } from '../../services/market.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
+import { NgxCroppedEvent, NgxPhotoEditorService } from 'ngx-photo-editor';
 
 @Component({
   selector: 'app-market',
@@ -13,6 +14,7 @@ export class MarketComponent implements OnInit {
   products: any[] = [];
   selectedProduct: any = null;
   showModal = false;
+  showCropper = false;
   productForm: FormGroup;
   selectedFiles: File[] = [];
   submitted = false;
@@ -20,12 +22,13 @@ export class MarketComponent implements OnInit {
   currentIndex = 0;
   isEditing = false;
   searchKeyword: string = '';
-  croppedImage: any = '';
+  output?: NgxCroppedEvent;
 
   constructor(
     private marketService: MarketService,
     private formBuilder: FormBuilder,
     public authService: AuthService,
+    private photoService: NgxPhotoEditorService,
     private router: Router
   ) {
     this.productForm = this.formBuilder.group({
@@ -103,60 +106,66 @@ export class MarketComponent implements OnInit {
   }
 
   onFileChange(event: any): void {
-    if (event.target.files.length > 0) {
-      this.selectedFiles = Array.from(event.target.files);
-      console.log('Selected files:', this.selectedFiles);
-      const fileReader = new FileReader();
-      fileReader.onload = (e: any) => {
-        this.croppedImage = e.target.result;
-      };
-      fileReader.readAsDataURL(this.selectedFiles[0]);
-    }
+    this.photoService.open(event, {
+      aspectRatio: 4 / 4,
+      autoCropArea: 1
+    }).subscribe(data => {
+      this.output = data;
+      this.showCropper = true;
+      // Non chiudere il modale di creazione prodotto
+    });
+  }
+
+  applyCrop(): void {
+    this.showCropper = false;
+    this.showModal = true; // Riapri il modal di creazione prodotto
+  }
+
+  cancelCrop(): void {
+    this.showCropper = false;
+    this.showModal = true; // Riapri il modal di creazione prodotto
   }
 
   onSubmit(): void {
     this.submitted = true;
     console.log('Form submitted. Valid:', this.productForm.valid, 'Editing:', this.isEditing);
 
-    if (this.productForm.invalid || (!this.isEditing && this.selectedFiles.length === 0)) {
-      console.log('Form is invalid or no files selected.');
+    if (this.productForm.invalid || (!this.isEditing && !this.output)) {
+      console.log('Form is invalid or no image selected.');
       return;
     }
 
     const productData = this.productForm.value;
     console.log('Submitting product:', productData);
-    console.log('Selected files:', this.selectedFiles);
+
+    const formData = new FormData();
+    formData.append('prodotto', JSON.stringify(productData));
+
+    if (this.output && this.output.base64) {
+      const file = this.dataURLtoFile(this.output.base64, 'cropped-image.png');
+      formData.append('files', file); // Cambia 'image' in 'files'
+    }
+
+    if (!this.isEditing && !this.output) {
+      formData.append('files', new Blob([])); // Aggiungi una parte vuota per 'files'
+    }
 
     if (this.isEditing && this.selectedProduct) {
       console.log('Editing product:', this.selectedProduct.id);
-      if (this.selectedFiles.length > 0) {
-        this.marketService.updateProductWithImages(this.selectedProduct.id, productData, this.selectedFiles).subscribe(
-          response => {
-            console.log('Product edited successfully', response);
-            this.updateProductList(response);
-            this.selectedProduct = response; // Aggiorna selectedProduct con i nuovi dati
-            this.closeModal();
-          },
-          error => {
-            console.error('Error editing product', error);
-          }
-        );
-      } else {
-        this.marketService.editProduct(this.selectedProduct.id, productData).subscribe(
-          response => {
-            console.log('Product edited successfully', response);
-            this.updateProductList(response);
-            this.selectedProduct = response; // Aggiorna selectedProduct con i nuovi dati
-            this.closeModal();
-          },
-          error => {
-            console.error('Error editing product', error);
-          }
-        );
-      }
+      this.marketService.editProduct(this.selectedProduct.id, formData).subscribe(
+        response => {
+          console.log('Product edited successfully', response);
+          this.updateProductList(response);
+          this.selectedProduct = response; // Aggiorna selectedProduct con i nuovi dati
+          this.closeModal();
+        },
+        error => {
+          console.error('Error editing product', error);
+        }
+      );
     } else {
       console.log('Creating product');
-      this.marketService.createProduct(productData, this.selectedFiles).subscribe(
+      this.marketService.createProduct(formData).subscribe(
         response => {
           console.log('Product created successfully', response);
           this.products.push(response);
@@ -167,6 +176,25 @@ export class MarketComponent implements OnInit {
         }
       );
     }
+  }
+
+  dataURLtoFile(dataurl: string, filename: string): File {
+    const arr = dataurl.split(',');
+    if (!arr[0] || !arr[1]) {
+      throw new Error('Invalid data URL');
+    }
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) {
+      throw new Error('Invalid mime type in data URL');
+    }
+    const mime = mimeMatch[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
   }
 
   searchProducts(): void {

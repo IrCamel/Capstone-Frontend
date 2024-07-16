@@ -5,6 +5,9 @@ import { MarketRoutingModule } from './market-routing.module';
 import { MarketComponent } from './market.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxPhotoEditorModule } from 'ngx-photo-editor';
+
+
 
 
 @NgModule({
@@ -17,7 +20,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-
+    NgxPhotoEditorModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

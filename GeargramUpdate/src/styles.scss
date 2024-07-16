@@ -1,11 +1,11 @@
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';
+
+@import '../node_modules/ngx-photo-editor/photo-editor.css';
+
+
 /* You can add global styles to this file, and also import other style files */
-body{
-  background-color: #18191A;
+  body{
+  background-color: #212121;
   color: white
 }
-
-/* Importing Bootstrap SCSS file. */
-@import 'bootstrap/scss/bootstrap';
-
-/* Importing Bootstrap SCSS file. */
-@import 'bootstrap/scss/bootstrap';

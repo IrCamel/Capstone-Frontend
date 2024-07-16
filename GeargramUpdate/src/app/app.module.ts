@@ -12,6 +12,10 @@ import { NavbarComponent } from './main-components/navbar/navbar/navbar.componen
 import { FooterComponent } from './main-components/footer/footer/footer.component';
 import { PostService } from './services/posts.service';
 import { JWT_OPTIONS, JwtHelperService, JwtModule } from '@auth0/angular-jwt';
+import { NgxPhotoEditorModule } from 'ngx-photo-editor';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+
 
 
 @NgModule({
@@ -30,6 +34,8 @@ import { JWT_OPTIONS, JwtHelperService, JwtModule } from '@auth0/angular-jwt';
     AuthModule,
     HomepageModule,
     JwtModule,
+    NgxPhotoEditorModule,
+    NgbModule,
 
   ],
   providers: [
